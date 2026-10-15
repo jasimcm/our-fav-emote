@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'" />
+  <title>Oru Companion Settings</title>
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <main>
+    <h1>Oru Companion</h1>
+    <p id="stats" class="muted"></p>
+
+    <section>
+      <h2>You</h2>
+      <label class="row">Your name <input id="name" type="text" maxlength="30" /></label>
+      <label class="row">Language
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="ml">മലയാളം (Malayalam)</option>
+        </select>
+      </label>
+    </section>
+
+    <section>
+      <h2>Character</h2>
+      <label class="row">Behaviour
+        <select id="behaviour">
+          <option value="visit">Walks in for reminders, then leaves</option>
+          <option value="wander">Stays on screen and wanders</option>
+        </select>
+      </label>
+      <label class="row">Character <select id="character"></select></label>
+      <p id="missing" class="muted small"></p>
+      <label class="row">Size <span class="slider"><input id="scale" type="range" min="50" max="150" step="5" /><output id="scale-out"></output></span></label>
+      <button id="create" class="link">Create a character from a photo…</button><br />
+      <button id="open-folder" class="link">Open characters folder…</button>
+    </section>
+
+    <section>
+      <h2>Voice</h2>
+      <label class="row">Speak reminders <input id="voice" type="checkbox" /></label>
+      <label class="row">Volume <span class="slider"><input id="volume" type="range" min="0" max="100" step="5" /><output id="volume-out"></output></span></label>
+    </section>
+
+    <section>
+      <h2>Reminders</h2>
+      <div id="reminders"></div>
+      <label class="row">“Remind me later” snoozes for <span><input id="snooze" type="number" min="1" max="120" /> min</span></label>
+    </section>
+
+    <section>
+      <h2>System</h2>
+      <label class="row">Start when I log in <input id="login" type="checkbox" /></label>
+    </section>
+
+    <p id="saved" class="muted" aria-live="polite"></p>
+  </main>
+  <script src="settings.js"></script>
+</body>
+</html>

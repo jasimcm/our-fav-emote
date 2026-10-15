@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'" />
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="char" hidden>
+    <div id="shadow"></div>
+    <video id="clip" muted playsinline preload="auto"></video>
+    <canvas id="ghost"></canvas>
+  </div>
+
+  <div id="bubble" role="dialog" aria-live="polite">
+    <p id="bubble-text"></p>
+    <div id="bubble-actions">
+      <button id="btn-yes" class="primary">Yes</button>
+      <button id="btn-later" class="link">Remind me later</button>
+    </div>
+  </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>

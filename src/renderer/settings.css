@@ -1,0 +1,88 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6f5f2;
+  --card: #ffffff;
+  --fg: #22201c;
+  --muted: #77726a;
+  --line: #e4e1da;
+  --accent: #1f6feb;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1c1f;
+    --card: #25272b;
+    --fg: #f0efec;
+    --muted: #a19e98;
+    --line: #34363b;
+    --accent: #4c8dff;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, "Nirmala UI", sans-serif;
+  accent-color: var(--accent);
+}
+main { padding: 20px 20px 12px; }
+h1 { margin: 0 0 2px; font-size: 20px; }
+h2 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+section {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+}
+.row + .row { border-top: 1px solid var(--line); }
+.muted { color: var(--muted); margin: 0; min-height: 1.4em; }
+.small { font-size: 12px; min-height: 0; padding-bottom: 6px; }
+.small:empty { display: none; }
+input[type="text"], select, input[type="number"] {
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+input[type="text"] { width: 180px; }
+input[type="number"] { width: 64px; }
+.slider { display: flex; align-items: center; gap: 8px; }
+.slider output { width: 40px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+button.link {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+.reminder {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+}
+.reminder + .reminder { border-top: 1px solid var(--line); }
+.reminder .every { color: var(--muted); }
+.reminder button {
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+}

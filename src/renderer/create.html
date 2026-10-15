@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'" />
+  <title>Create a character</title>
+  <link rel="stylesheet" href="settings.css" />
+  <link rel="stylesheet" href="create.css" />
+</head>
+<body>
+  <main>
+    <h1>Create a character</h1>
+    <p class="muted">Turn one full-body photo into a companion that walks, waves, laughs and reminds you to drink water.
+      It takes three videos from Gemini.</p>
+
+    <p id="unsupported" class="notice" hidden>Creating characters needs macOS for now.</p>
+
+    <section id="step-photo">
+      <h2><span class="num">1</span> Photo</h2>
+      <label class="row">Name <input id="name" type="text" maxlength="30" placeholder="e.g. Maya" /></label>
+      <label class="row consent"><span>This is me, or I have this person's permission to use their photo</span>
+        <input id="consent" type="checkbox" /></label>
+      <div class="row">
+        <span class="hint">Whole body, head to shoes, standing straight, arms at the sides</span>
+        <button id="pick-photo" class="btn" disabled>Choose photo…</button>
+      </div>
+      <p id="photo-status" class="muted small"></p>
+      <figure id="photo-preview" hidden>
+        <img id="photo-img" alt="Prepared photo" />
+        <figcaption class="muted small">Prepared for Gemini: centred, whole body, on a plain backdrop.</figcaption>
+      </figure>
+      <ul id="photo-warnings" class="warnings"></ul>
+      <div class="row" id="save-row" hidden>
+        <span class="hint">Save this image, then upload it to Gemini in step 2</span>
+        <button id="save-image" class="btn primary">Save image…</button>
+      </div>
+    </section>
+
+    <section id="step-gemini">
+      <h2><span class="num">2</span> Make three videos in Gemini</h2>
+      <ol class="how">
+        <li>Open Gemini, choose <b>Video</b>, and attach the saved image.</li>
+        <li>Paste one prompt below and generate. Download the video when it's ready.</li>
+        <li>Repeat for all three prompts, using the same image each time.</li>
+      </ol>
+      <div class="row"><span class="hint">Gemini Pro makes 3 videos a day: exactly enough</span>
+        <button id="open-gemini" class="btn">Open Gemini</button></div>
+      <div id="recipes"></div>
+    </section>
+
+    <section id="step-build">
+      <h2><span class="num">3</span> Add the videos</h2>
+      <div id="videos"></div>
+      <div class="row">
+        <span class="hint" id="build-hint">Add at least the Hello video</span>
+        <button id="build" class="btn primary" disabled>Create character</button>
+      </div>
+      <pre id="log" hidden></pre>
+      <ul id="build-warnings" class="warnings"></ul>
+      <div id="result" hidden>
+        <div id="clips"></div>
+        <div class="row">
+          <span class="hint">Saved to your characters folder</span>
+          <button id="use" class="btn primary">Use this character</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="create.js"></script>
+</body>
+</html>

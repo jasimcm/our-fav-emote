@@ -1,0 +1,34 @@
+{
+  "name": "Placeholder",
+  "author": "Oru Companion",
+  "height": 300,
+  "walkSpeed": 180,
+  "clips": {
+    "walk_right": "walk_right.webm",
+    "walk_left": "walk_left.webm",
+    "idle": "idle.webm",
+    "wave": "wave.webm",
+    "drink_water": "drink_water.webm",
+    "point": "point.webm",
+    "sit": "sit.webm",
+    "sleep": "sleep.webm",
+    "laugh": "laugh.webm",
+    "think": "think.webm",
+    "surprised": "surprised.webm"
+  },
+  "lines": {
+    "en": {
+      "water": {
+        "text": "{name}, time to drink some water! 💧",
+        "thanks": "Good! Stay hydrated 😄"
+      }
+    },
+    "ml": {
+      "water": {
+        "text": "{name}, വെള്ളം കുടിക്കാൻ സമയമായി! 💧",
+        "thanks": "അടിപൊളി! 😄"
+      }
+    }
+  },
+  "voices": {}
+}
