@@ -50,14 +50,15 @@ export async function preparePhoto(src: string, out: string): Promise<PreparedPh
   const inDir = path.join(dir, 'in'), cutDir = path.join(dir, 'cut');
   fs.mkdirSync(inDir);
   try {
-    // sips reads anything Photos can (HEIC, JPEG, PNG...) and applies the camera rotation
-    await run('sips', ['-s', 'format', 'png', src, '--out', path.join(inDir, '00001.png')]);
+    // the original file goes straight to the cut-out tool, which reads HEIC/JPEG/PNG and applies
+    // the camera's rotation tag (iPhone photos are stored sideways with "rotate 90°")
+    const ext = path.extname(src).toLowerCase() || '.jpg';
+    fs.copyFileSync(src, path.join(inDir, `00001${ext}`));
     await run(segmentPath(), ['--raw', inDir, cutDir]); // the photo's own background can be anything
     const stat = JSON.parse(fs.readFileSync(path.join(cutDir, 'stats.jsonl'), 'utf8').trim().split('\n')[0]);
     if (!stat.box) throw new Error("Couldn't find a person in this photo.");
     const [x0, y0, x1, y1] = stat.box as number[];
-    const dims = (await run('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', path.join(inDir, '00001.png')])).toString();
-    const iw = Number(dims.match(/pixelWidth: (\d+)/)?.[1]), ih = Number(dims.match(/pixelHeight: (\d+)/)?.[1]);
+    const iw: number = stat.w, ih: number = stat.h; // upright size
 
     const warnings: string[] = [];
     if (y0 <= 2) warnings.push('The top of the head touches the edge of the photo. It may be cut off.');

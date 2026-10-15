@@ -2,8 +2,10 @@
 // Keeps only the largest foreground subject (drops watermarks / stray objects).
 // Usage: segment [--raw] <inDir> <outDir>
 //   --raw  Vision's cut-out only: no backdrop-colour clean-up (for photos with arbitrary backgrounds)
-// Writes <outDir>/<frame>.png (RGBA, same size as input) and <outDir>/stats.jsonl
-// (one {"f":name,"box":[minX,minY,maxX,maxY],"legsX":cx} per frame, top-left origin).
+// Inputs can be PNG, JPEG, HEIC...; the camera's orientation tag is applied (iPhone photos are
+// stored sideways with a "rotate 90°" tag). Writes <outDir>/<frame>.png (RGBA, upright) and
+// <outDir>/stats.jsonl: one {"f":name.png,"w":..,"h":..,"box":[minX,minY,maxX,maxY],"legsX":cx}
+// per frame, top-left origin.
 import AppKit
 import CoreImage
 import Foundation
@@ -15,7 +17,9 @@ args.removeAll { $0 == "--raw" }
 guard args.count == 3 else { print("usage: segment [--raw] <inDir> <outDir>"); exit(1) }
 let inDir = URL(fileURLWithPath: args[1]), outDir = URL(fileURLWithPath: args[2])
 try FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
-let files = try FileManager.default.contentsOfDirectory(atPath: inDir.path).filter { $0.hasSuffix(".png") }.sorted()
+let imageTypes: Set<String> = ["png", "jpg", "jpeg", "heic", "heif", "tif", "tiff", "webp"]
+let files = try FileManager.default.contentsOfDirectory(atPath: inDir.path)
+  .filter { imageTypes.contains(($0 as NSString).pathExtension.lowercased()) }.sorted()
 let ctx = CIContext()
 var stats = ""
 
@@ -151,10 +155,13 @@ func clearEnclosedBackdrop(_ cg: CGImage, backdrop bg: (Double, Double, Double),
 
 for (i, f) in files.enumerated() {
   autoreleasepool {
-    guard let img = CIImage(contentsOf: inDir.appendingPathComponent(f)) else { return }
+    guard let img = CIImage(contentsOf: inDir.appendingPathComponent(f), options: [.applyOrientationProperty: true])
+    else { return }
+    let name = ((f as NSString).deletingPathExtension) + ".png"
+    let size = "\"w\":\(Int(img.extent.width)),\"h\":\(Int(img.extent.height))"
     let req = VNGenerateForegroundInstanceMaskRequest()
     let handler = VNImageRequestHandler(ciImage: img)
-    var line = "{\"f\":\"\(f)\",\"box\":null}"
+    var line = "{\"f\":\"\(name)\",\(size),\"box\":null}"
     if (try? handler.perform([req])) != nil, let obs = req.results?.first, let inst = largestInstance(obs),
        let buf = try? obs.generateMaskedImage(ofInstances: IndexSet(integer: inst), from: handler, croppedToInstancesExtent: false) {
       let ci = CIImage(cvPixelBuffer: buf)
@@ -163,9 +170,9 @@ for (i, f) in files.enumerated() {
         let bg = backdropColor(src)
         let cg = rawOnly ? raw : cleanEdges(clearEnclosedBackdrop(raw, backdrop: bg), backdrop: bg)
         try? NSBitmapImageRep(cgImage: cg).representation(using: .png, properties: [:])!
-          .write(to: outDir.appendingPathComponent(f))
+          .write(to: outDir.appendingPathComponent(name))
         if let m = measure(cg) {
-          line = "{\"f\":\"\(f)\",\"box\":[\(m.box.map(String.init).joined(separator: ","))],\"legsX\":\(String(format: "%.1f", m.legsX))}"
+          line = "{\"f\":\"\(name)\",\(size),\"box\":[\(m.box.map(String.init).joined(separator: ","))],\"legsX\":\(String(format: "%.1f", m.legsX))}"
         }
       }
     }

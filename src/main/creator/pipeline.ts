@@ -219,8 +219,13 @@ export function bestLoop(work: VideoWork, range: Range, minS: number, maxS: numb
   return { range: out, seam: best };
 }
 
-/** The planted foot is the only thing touching the ground: how fast it slides back = walk speed (canvas px/s). */
-export async function measureWalkSpeed(work: VideoWork, [a, b]: Range): Promise<number> {
+/**
+ * The planted foot is the only thing touching the ground. How fast it slides back is the walk
+ * speed (canvas px/s), and which way it slides tells which way the person faces: a foot sliding
+ * left means they face right. (Gemini doesn't always face the way the prompt asks, and saving a
+ * left-facing walk as walk_right makes the character moonwalk.)
+ */
+export async function measureWalk(work: VideoWork, [a, b]: Range): Promise<{ speed: number; facing: 'left' | 'right' }> {
   const BAND = 6;
   const raw = await run(ffmpegPath(), ['-loglevel', 'error', '-start_number', String(a + 1), '-i', path.join(work.canvasDir, '%05d.png'),
     '-frames:v', String(b - a), '-vf', `crop=${W}:${BAND}:0:${FEET_Y - BAND - 2},alphaextract,format=gray`, '-f', 'rawvideo', '-']);
@@ -240,7 +245,8 @@ export async function measureWalkSpeed(work: VideoWork, [a, b]: Range): Promise<
     }
     shifts.push(bestS);
   }
-  return Math.max(40, Math.round(Math.abs(median(shifts)) * FPS));
+  const m = median(shifts);
+  return { speed: Math.max(40, Math.round(Math.abs(m) * FPS)), facing: m > 0 ? 'left' : 'right' };
 }
 
 /**

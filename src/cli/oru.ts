@@ -8,7 +8,7 @@ import { parseArgs } from 'node:util';
 import type { CharacterManifest, ClipName } from '../shared/types';
 import { createCharacter } from '../main/creator/create';
 import { preparePhoto } from '../main/creator/photo';
-import { bestLoop, cleanup, encodeClip, FPS, measureWalkSpeed, processVideo, seconds, type Range } from '../main/creator/pipeline';
+import { bestLoop, cleanup, encodeClip, FPS, measureWalk, processVideo, seconds, type Range } from '../main/creator/pipeline';
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const log = (m: string) => console.log(`  ${m}`);
@@ -71,13 +71,20 @@ async function main(): Promise<void> {
       const m: CharacterManifest = fs.existsSync(mPath)
         ? JSON.parse(fs.readFileSync(mPath, 'utf8'))
         : { name: a.char, height: 340, walkSpeed: 150, clips: {} };
+      let clipName = a.clip as ClipName;
       if (a.walk) {
-        m.walkSpeed = await measureWalkSpeed(work, range);
-        log(`walk speed ${m.walkSpeed}px/s`);
+        const walk = await measureWalk(work, range);
+        m.walkSpeed = walk.speed;
+        log(`walk speed ${m.walkSpeed}px/s, facing ${walk.facing}`);
+        const named: ClipName = walk.facing === 'left' ? 'walk_left' : 'walk_right';
+        if (clipName.startsWith('walk_') && clipName !== named) {
+          log(`the person faces ${walk.facing}, so saving as ${named} instead of ${clipName}`);
+          clipName = named;
+        }
       }
-      const file = `${a.clip}.webm`;
+      const file = `${clipName}.webm`;
       await encodeClip(work, path.join(dir, file), range, { fps: num(a.fps) ?? FPS });
-      m.clips[a.clip as ClipName] = file;
+      m.clips[clipName] = file;
       fs.writeFileSync(mPath, JSON.stringify(m, null, 2) + '\n');
       console.log(`wrote characters/${a.char}/${file} (${seconds(range)})`);
     } finally {

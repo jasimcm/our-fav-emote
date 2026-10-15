@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { CharacterManifest, ClipName } from '../../shared/types';
 import {
-  bestLoop, cleanup, encodeClip, findActions, measureWalkSpeed, processVideo, seconds, type Log, type Range, type VideoWork,
+  bestLoop, cleanup, encodeClip, findActions, measureWalk, processVideo, seconds, type Log, type Range, type VideoWork,
 } from './pipeline';
 import { RECIPES } from './recipes';
 
@@ -53,9 +53,11 @@ export async function createCharacter(input: CreateInput): Promise<CreateResult>
         let loop = bestLoop(work, half, 1.5, 4);
         if (loop.seam > 6) loop = bestLoop(work, [0, work.count], 1.5, 4);
         if (loop.seam > 8) warnings.push('The walk loop has a visible jump. Try regenerating the walk video.');
-        walkSpeed = await measureWalkSpeed(work, loop.range);
-        log(`walk speed ${walkSpeed}px/s`);
-        await write(work, 'walk_right', loop.range);
+        const walk = await measureWalk(work, loop.range);
+        walkSpeed = walk.speed;
+        log(`walk speed ${walkSpeed}px/s, facing ${walk.facing}`);
+        // save it under the direction they actually face; the other direction is mirrored
+        await write(work, walk.facing === 'left' ? 'walk_left' : 'walk_right', loop.range);
         continue;
       }
 
