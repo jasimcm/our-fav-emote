@@ -139,6 +139,15 @@ node dist/cli/oru.js prepare-photo photo.heic for-gemini.png
 node dist/cli/oru.js create --id maya --name "Maya" --hello hello.mp4 --water water.mp4 --walk walk.mp4
 ```
 
+**Background removal, per platform:**
+
+| | macOS | Windows / Linux |
+| --- | --- | --- |
+| Photo (any background) | Apple Vision (`tools/segment.swift`) | [U²-Net human segmentation](https://github.com/xuebinqin/U-2-Net) (Apache-2.0) via `onnxruntime-node`, `photo-ml.ts`. The 176 MB model is downloaded once to the app's data folder and checked against its SHA-256 |
+| Videos (our plain backdrop) | Apple Vision + backdrop clean-up | Colour-difference key, `keyer.ts`: backdrop sampled from the frame border, hue-only distance (shadows and vignetting key out), largest shape kept (drops watermarks), edge tint removed |
+
+Set `ORU_PORTABLE=1` to use the Windows/Linux path on a Mac (for testing).
+
 1. **Photo:** the photo is read with its camera rotation applied (iPhone photos are stored
    sideways with a rotate tag). The person is cut out and placed, whole body and centred, on a
    plain 1280×720 backdrop. The colour (blue, green or magenta) is the one least like their

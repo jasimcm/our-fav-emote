@@ -13,16 +13,19 @@ AI videos.
 
 ## What you need
 
-- **A Mac**, or Windows if you only want the companion. Making your own character needs a Mac.
+- **A Mac or a Windows PC.** Both can run the companion *and* make your own character.
 - **Node.js**: download the **LTS** version from [nodejs.org](https://nodejs.org) and install it.
-- **Git**: on a Mac, open Terminal and type `git --version`; if it isn't installed, macOS offers to
-  install it.
+- **Git**:
+  - Mac: open Terminal and type `git --version`. If it isn't installed, macOS offers to install it.
+  - Windows: install [Git for Windows](https://git-scm.com/download/win) (the default options are fine).
 - *Only for your own character:* a **Gemini** account that can make videos (Gemini Pro makes
   3 videos a day, which is exactly enough).
 
 ## Step 1: Install and start
 
-Open **Terminal** (press `⌘ Space`, type *Terminal*, press Enter) and paste these lines one at a time:
+Open a terminal and paste these lines one at a time:
+- **Mac:** press `⌘ Space`, type *Terminal*, press Enter.
+- **Windows:** press the Windows key, type *cmd*, press Enter (Command Prompt).
 
 ```sh
 git clone https://github.com/jasimcm/our-fav-emote.git
@@ -36,7 +39,7 @@ A character walks in, says hi, and walks off. 🎉
 Look for the small **person icon in the menu bar** at the top of the screen (on Windows, in the
 tray by the clock). Everything is in that menu.
 
-> Next time, to start it again: open Terminal, run `cd our-fav-emote`, then `npm start`.
+> Next time, to start it again: open the terminal, run `cd our-fav-emote`, then `npm start`.
 
 ## Step 2: Make it yours
 
@@ -50,7 +53,7 @@ Menu bar icon → **Reminder settings…**
 
 <p align="center"><img src="docs/images/settings.png" width="300" alt="Settings window"></p>
 
-## Step 3: Turn yourself into the companion (Mac)
+## Step 3: Turn yourself into the companion
 
 Menu bar icon → **Create a character from a photo…**
 
@@ -62,7 +65,13 @@ result, the photo should show:
 - you **standing straight, arms relaxed at your sides**, facing the camera
 - good light, and nobody else in the photo
 
+Use a **JPEG or PNG** photo. Macs also take iPhone **HEIC** photos; on Windows, send the photo from
+your iPhone as JPEG (or set *Settings → Camera → Formats → Most Compatible*).
+
 The app removes the background and gives you a clean image. Press **Save image…**
+
+> **Windows, first time only:** the app downloads its background-removal AI model (176 MB). It's
+> saved, so this happens once.
 
 **2. Make three videos in Gemini, all in one chat.**
 1. Press **Open Gemini**, start a **new chat**, choose **Video**, and attach the saved image.
@@ -81,6 +90,8 @@ The app removes the background and gives you a clean image. Press **Save image�
 | --- | --- |
 | No character on the screen | The default behaviour only shows them for reminders. Use menu → **Remind me now** to call them. Also check the menu doesn't say **Resume** (paused). |
 | The app says the feet or head are cut off | Use a photo with your whole body in it, from head to shoes. |
+| "HEIC photos aren't supported here" (Windows) | Save or send the photo as JPEG and choose it again. |
+| The photo came out on its side | Update the app (`git pull`, then `npm start`). Phone photos are now turned the right way up automatically. |
 | A move looks wrong in the preview, e.g. the wave is cut short | Ask Gemini for that video again in the same chat, then press **Create character** again. |
 | The character slides or walks oddly | Regenerate video 3 (the walk). It needs a side view, walking in place. |
 | Want to stop it | Menu → **Quit**. |

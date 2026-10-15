@@ -3,7 +3,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { ffmpeg, ffmpegPath, run, segmentPath } from './tools';
+import { keyFrames } from './keyer';
+import { ffmpeg, ffmpegPath, run, segmentPath, useVision } from './tools';
 
 export const W = 400, H = 640;
 const FEET_Y = 630; // feet bottom on the canvas
@@ -49,10 +50,19 @@ export async function processVideo(
   if (!total) throw new Error(`${opts.label}: no frames could be read from the video`);
 
   log(`${opts.label}: removing the background (${total} frames)`);
-  await run(segmentPath(), [frames, cut], (line) => {
-    const m = line.match(/segmented (\d+)\/(\d+)/);
-    if (m) log(`${opts.label}: removing the background ${Math.round((100 * +m[1]) / +m[2])}%`);
-  });
+  const progress = (done: number, all: number) => log(`${opts.label}: removing the background ${Math.round((100 * done) / all)}%`);
+  if (useVision()) {
+    await run(segmentPath(), [frames, cut], (line) => {
+      const m = line.match(/segmented (\d+)\/(\d+)/);
+      if (m) progress(+m[1], +m[2]);
+    });
+  } else {
+    let last = -1;
+    await keyFrames(frames, cut, (done, all) => {
+      const p = Math.floor((10 * done) / all);
+      if (p !== last) { last = p; progress(done, all); }
+    });
+  }
   const stats: FrameStat[] = fs.readFileSync(path.join(cut, 'stats.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   const found = stats.map((s, i) => ({ ...s, i })).filter((s): s is FrameStat & { i: number; box: [number, number, number, number]; legsX: number } => !!s.box);
   if (found.length < total * 0.6) throw new Error(`${opts.label}: couldn't find the person in most frames`);

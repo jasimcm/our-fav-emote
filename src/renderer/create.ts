@@ -34,7 +34,10 @@ pickPhoto.addEventListener('click', async () => {
   if (src) await usePhoto(src);
 });
 
+let preparingPhoto = false;
+
 async function usePhoto(src: string): Promise<void> {
+  preparingPhoto = true;
   $('photo-status').textContent = 'Finding the person and preparing the image…';
   list($('photo-warnings'), []);
   try {
@@ -47,6 +50,8 @@ async function usePhoto(src: string): Promise<void> {
   } catch (e) {
     $('photo-status').textContent = '';
     list($('photo-warnings'), [(e as Error).message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '')]);
+  } finally {
+    preparingPhoto = false;
   }
 }
 
@@ -115,6 +120,11 @@ function renderVideoRows(recipes: CreatorRecipe[]): void {
 }
 
 c.onLog((line) => {
+  // during photo prep (e.g. the one-time model download on Windows) show progress under the photo
+  if (preparingPhoto) {
+    $('photo-status').textContent = line;
+    return;
+  }
   // collapse "removing the background 40%" progress into one line
   const lines = log.textContent!.split('\n').filter(Boolean);
   const key = line.replace(/\d+%$/, '');
@@ -160,9 +170,6 @@ buildBtn.addEventListener('click', async () => {
 c.info().then(({ supported, recipes }) => {
   renderRecipes(recipes);
   renderVideoRows(recipes);
-  if (!supported) {
-    $('unsupported').hidden = false;
-    document.querySelectorAll<HTMLButtonElement>('button').forEach((b) => (b.disabled = true));
-  }
+  void supported; // every platform is supported now (Vision on macOS, portable keyer + U²-Net elsewhere)
   refresh();
 });

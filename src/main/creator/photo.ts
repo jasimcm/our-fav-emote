@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { ffmpeg, ffmpegPath, run, segmentPath } from './tools';
+import { cutOutPhoto } from './photo-ml';
+import { ffmpeg, ffmpegPath, run, segmentPath, useVision } from './tools';
 
 export interface PreparedPhoto {
   /** 1280x720 image to upload to Gemini: the person, centred, on a plain backdrop. */
@@ -45,17 +46,25 @@ async function pickBackdrop(cutout: string): Promise<(typeof BACKDROPS)[number]>
  * Starting every video from this same clean image keeps the person consistent across videos
  * and makes the background easy to remove afterwards.
  */
-export async function preparePhoto(src: string, out: string): Promise<PreparedPhoto> {
+export async function preparePhoto(
+  src: string, out: string, opts: { modelsDir: string; progress?: (msg: string) => void },
+): Promise<PreparedPhoto> {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oru-photo-'));
   const inDir = path.join(dir, 'in'), cutDir = path.join(dir, 'cut');
   fs.mkdirSync(inDir);
   try {
-    // the original file goes straight to the cut-out tool, which reads HEIC/JPEG/PNG and applies
-    // the camera's rotation tag (iPhone photos are stored sideways with "rotate 90°")
-    const ext = path.extname(src).toLowerCase() || '.jpg';
-    fs.copyFileSync(src, path.join(inDir, `00001${ext}`));
-    await run(segmentPath(), ['--raw', inDir, cutDir]); // the photo's own background can be anything
-    const stat = JSON.parse(fs.readFileSync(path.join(cutDir, 'stats.jsonl'), 'utf8').trim().split('\n')[0]);
+    let stat: { w: number; h: number; box: number[] | null };
+    if (useVision()) {
+      // the original file goes straight to the cut-out tool, which reads HEIC/JPEG/PNG and applies
+      // the camera's rotation tag (iPhone photos are stored sideways with "rotate 90°")
+      const ext = path.extname(src).toLowerCase() || '.jpg';
+      fs.copyFileSync(src, path.join(inDir, `00001${ext}`));
+      await run(segmentPath(), ['--raw', inDir, cutDir]); // the photo's own background can be anything
+      stat = JSON.parse(fs.readFileSync(path.join(cutDir, 'stats.jsonl'), 'utf8').trim().split('\n')[0]);
+    } else {
+      fs.mkdirSync(cutDir);
+      stat = await cutOutPhoto(src, path.join(cutDir, '00001.png'), opts.modelsDir, opts.progress ?? (() => {}));
+    }
     if (!stat.box) throw new Error("Couldn't find a person in this photo.");
     const [x0, y0, x1, y1] = stat.box as number[];
     const iw: number = stat.w, ih: number = stat.h; // upright size

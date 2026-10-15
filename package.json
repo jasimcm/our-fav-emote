@@ -67,7 +67,8 @@
       ]
     },
     "asarUnpack": [
-      "node_modules/ffmpeg-static/**"
+      "node_modules/ffmpeg-static/**",
+      "node_modules/onnxruntime-node/**"
     ]
   },
   "dependencies": {

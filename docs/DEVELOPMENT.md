@@ -13,7 +13,11 @@
 | `node dist/cli/oru.js …` | Character tools on the command line (macOS): `prepare-photo`, `create`, `import-clip`, `analyze`; see [CHARACTERS.md](CHARACTERS.md) |
 
 The smoke test can also drive the character creator: set `ORU_SMOKE_CREATOR` to a folder containing
-`photo.jpg`, `hello.mp4` and `walk.mp4`.
+`photo.jpg`, `hello.mp4` and `walk.mp4`. Add `ORU_PORTABLE=1` to test the Windows/Linux background
+removal on a Mac.
+
+**Building the Windows app:** run `npm install` and `npm run dist:win` **on Windows**, so the bundled
+ffmpeg and onnxruntime binaries are the Windows ones.
 
 ## How it works
 

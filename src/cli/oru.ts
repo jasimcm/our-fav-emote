@@ -3,6 +3,7 @@
 //   node dist/cli/oru.js create --id maya --name "Maya" --hello a.mp4 --water b.mp4 --walk c.mp4
 //   node dist/cli/oru.js import-clip --char maya --clip idle --src x.mp4 [--from s] [--to s] [--fps 12] [--loop 4:9] [--walk]
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import type { CharacterManifest, ClipName } from '../shared/types';
@@ -18,7 +19,10 @@ const num = (v: string | undefined) => (v === undefined ? undefined : Number(v))
 async function main(): Promise<void> {
   if (cmd === 'prepare-photo') {
     const [src, out] = rest;
-    const r = await preparePhoto(path.resolve(src), path.resolve(out));
+    const r = await preparePhoto(path.resolve(src), path.resolve(out), {
+      modelsDir: path.join(os.homedir(), '.cache', 'oru-companion', 'models'),
+      progress: log,
+    });
     console.log(`wrote ${r.image}`);
     r.warnings.forEach((w) => console.log(`warning: ${w}`));
     return;

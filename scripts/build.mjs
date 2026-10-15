@@ -7,8 +7,8 @@ const common = { bundle: true, sourcemap: true, logLevel: 'info', target: 'es202
 
 await Promise.all([
   // ffmpeg-static stays external: it locates its binary relative to its own folder
-  build({ ...common, entryPoints: ['src/main/main.ts'], outfile: 'dist/main/main.js', platform: 'node', format: 'cjs', external: ['electron', 'ffmpeg-static'] }),
-  build({ ...common, entryPoints: ['src/cli/oru.ts'], outfile: 'dist/cli/oru.js', platform: 'node', format: 'cjs', external: ['ffmpeg-static'] }),
+  build({ ...common, entryPoints: ['src/main/main.ts'], outfile: 'dist/main/main.js', platform: 'node', format: 'cjs', external: ['electron', 'ffmpeg-static', 'onnxruntime-node'] }),
+  build({ ...common, entryPoints: ['src/cli/oru.ts'], outfile: 'dist/cli/oru.js', platform: 'node', format: 'cjs', external: ['ffmpeg-static', 'onnxruntime-node'] }),
   build({ ...common, entryPoints: ['src/preload/preload.ts'], outfile: 'dist/preload/preload.js', platform: 'node', format: 'cjs', external: ['electron'] }),
   build({ ...common, entryPoints: ['src/renderer/overlay.ts', 'src/renderer/settings.ts', 'src/renderer/create.ts'], outdir: 'dist/renderer', platform: 'browser', format: 'iife' }),
 ]);

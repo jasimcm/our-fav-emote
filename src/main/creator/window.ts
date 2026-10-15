@@ -56,7 +56,10 @@ export function registerCreatorIpc(useCharacter: (id: string) => void): void {
   ipcMain.handle('creator:preparePhoto', async (_e, src: string): Promise<CreatorPhoto> => {
     fs.mkdirSync(workDir, { recursive: true });
     const out = path.join(workDir, 'for-gemini.png');
-    const r = await preparePhoto(src, out);
+    const r = await preparePhoto(src, out, {
+      modelsDir: path.join(app.getPath('userData'), 'models'),
+      progress: (m) => _e.sender.send('creator:log', m),
+    });
     prepared = out;
     return {
       preview: `data:image/png;base64,${fs.readFileSync(out).toString('base64')}`,

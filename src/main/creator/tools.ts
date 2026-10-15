@@ -24,16 +24,26 @@ export function segmentPath(): string {
   return bin;
 }
 
-export const creatorSupported = () => process.platform === 'darwin';
+/**
+ * Background removal: Apple's Vision on macOS; elsewhere (or with ORU_PORTABLE=1, for testing)
+ * a colour key for the videos and a U²-Net model for the photo.
+ */
+export const useVision = () => process.platform === 'darwin' && !process.env.ORU_PORTABLE;
 
-/** Runs a command; resolves with stdout as a Buffer. Streams stdout lines to `onLine` if given. */
-export function run(cmd: string, args: string[], onLine?: (line: string) => void): Promise<Buffer> {
+export const creatorSupported = () => true;
+
+/**
+ * Runs a command; resolves with stdout as a Buffer. Streams stdout lines to `onLine` if given,
+ * and writes `input` to stdin if given.
+ */
+export function run(cmd: string, args: string[], onLine?: (line: string) => void, input?: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(cmd, args, { stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe'] });
+    if (input) child.stdin!.end(input);
     const out: Buffer[] = [];
     let err = '';
     let partial = '';
-    child.stdout.on('data', (d: Buffer) => {
+    child.stdout!.on('data', (d: Buffer) => {
       out.push(d);
       if (!onLine) return;
       partial += d.toString();
@@ -41,7 +51,7 @@ export function run(cmd: string, args: string[], onLine?: (line: string) => void
       partial = lines.pop() ?? '';
       lines.filter(Boolean).forEach(onLine);
     });
-    child.stderr.on('data', (d: Buffer) => (err += d.toString()));
+    child.stderr!.on('data', (d: Buffer) => (err += d.toString()));
     child.on('error', reject);
     child.on('close', (code) => {
       if (code === 0) resolve(Buffer.concat(out));
