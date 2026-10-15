@@ -25,8 +25,8 @@ AI videos.
 Open **Terminal** (press `⌘ Space`, type *Terminal*, press Enter) and paste these lines one at a time:
 
 ```sh
-git clone https://github.com/jasimcm/oru-companion.git
-cd oru-companion
+git clone https://github.com/jasimcm/our-fav-emote.git
+cd our-fav-emote
 npm install
 npm start
 ```
@@ -36,7 +36,7 @@ A character walks in, says hi, and walks off. 🎉
 Look for the small **person icon in the menu bar** at the top of the screen (on Windows, in the
 tray by the clock). Everything is in that menu.
 
-> Next time, to start it again: open Terminal, run `cd oru-companion`, then `npm start`.
+> Next time, to start it again: open Terminal, run `cd our-fav-emote`, then `npm start`.
 
 ## Step 2: Make it yours
 
