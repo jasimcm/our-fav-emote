@@ -8,10 +8,11 @@
     "typecheck": "tsc --noEmit -p .",
     "start": "npm run build && electron .",
     "placeholders": "electron scripts/make-placeholders.cjs",
-    "dist:win": "npm run build && electron-builder --win",
+    "dist:win": "npm run build && electron-builder --win --publish never",
     "smoke": "npm run build && node scripts/smoke.mjs",
-    "dist:mac": "npm run build && npm run build:segment && electron-builder --mac",
-    "build:segment": "swiftc -O tools/segment.swift -o tools/bin/segment"
+    "dist:mac": "npm run build && npm run build:segment && electron-builder --mac --publish never",
+    "build:segment": "swiftc -O tools/segment.swift -o tools/bin/segment",
+    "test-media": "node scripts/make-test-media.mjs .smoke-media"
   },
   "author": "Jasim",
   "license": "MIT",
@@ -33,26 +34,41 @@
       "!characters/**/import.sh",
       "!characters/**/sources.json",
       "assets/**",
-      "package.json"
+      "package.json",
+      "!node_modules/onnxruntime-node/bin/napi-v*/linux/**"
     ],
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "files": [
+        "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/arm64/**"
+      ]
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": false
+      "perMachine": false,
+      "artifactName": "Oru-Companion-Setup-${version}.${ext}"
     },
     "directories": {
       "output": "release"
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "icon": "assets/icon.png",
       "category": "public.app-category.lifestyle",
@@ -64,12 +80,21 @@
           "from": "tools/bin/segment",
           "to": "bin/segment"
         }
+      ],
+      "files": [
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/**"
       ]
     },
     "asarUnpack": [
       "node_modules/ffmpeg-static/**",
       "node_modules/onnxruntime-node/**"
-    ]
+    ],
+    "portable": {
+      "artifactName": "Oru-Companion-${version}-portable.${ext}"
+    },
+    "dmg": {
+      "artifactName": "Oru-Companion-${version}-mac-${arch}.${ext}"
+    }
   },
   "dependencies": {
     "ffmpeg-static": "^5.3.0",

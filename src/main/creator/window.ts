@@ -57,7 +57,8 @@ export function registerCreatorIpc(useCharacter: (id: string) => void): void {
     fs.mkdirSync(workDir, { recursive: true });
     const out = path.join(workDir, 'for-gemini.png');
     const r = await preparePhoto(src, out, {
-      modelsDir: path.join(app.getPath('userData'), 'models'),
+      // ORU_MODELS_DIR lets tests/CI reuse one downloaded model
+      modelsDir: process.env.ORU_MODELS_DIR || path.join(app.getPath('userData'), 'models'),
       progress: (m) => _e.sender.send('creator:log', m),
     });
     prepared = out;

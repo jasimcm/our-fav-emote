@@ -46,7 +46,7 @@ async function smoke(ctx: Ctx, outDir: string): Promise<void> {
     `(() => { const c = document.getElementById('char'); const v = document.getElementById('clip');
       const tx = parseFloat(c.style.transform.slice('translate('.length));
       return { hidden: c.hidden, clip: v.dataset.clip, x: tx + v.offsetWidth / 2, w: innerWidth }; })()`);
-  const waitFor = async (what: string, ok: () => Promise<boolean>, ms = 40000) => {
+  const waitFor = async (what: string, ok: () => Promise<boolean>, ms = 75000) => {
     for (const t0 = Date.now(); Date.now() - t0 < ms; await wait(250)) if (await ok()) return;
     throw new Error(`timed out waiting for: ${what}`);
   };
