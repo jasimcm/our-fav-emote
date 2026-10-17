@@ -11,21 +11,33 @@ AI videos.
 
 ---
 
-## What you need
+## Step 1: Get the app
 
-- **A Mac or a Windows PC.** Both can run the companion *and* make your own character.
-- **Node.js**: download the **LTS** version from [nodejs.org](https://nodejs.org) and install it.
-- **Git**:
-  - Mac: open Terminal and type `git --version`. If it isn't installed, macOS offers to install it.
-  - Windows: install [Git for Windows](https://git-scm.com/download/win) (the default options are fine).
-- *Only for your own character:* a **Gemini** account that can make videos (Gemini Pro makes
-  3 videos a day, which is exactly enough).
+Go to the **[Releases page](https://github.com/jasimcm/our-fav-emote/releases/latest)** and download:
 
-## Step 1: Install and start
+| Your computer | Download | Then |
+| --- | --- | --- |
+| **Windows** | `Oru-Companion-Setup-….exe` | Double-click it. It installs and starts by itself. |
+| Windows, no install | `Oru-Companion-…-portable.exe` | Double-click it to run it from anywhere, e.g. a USB stick. |
+| **Mac** (M1 or newer) | `Oru-Companion-…-mac-arm64.dmg` | Open it and drag the app into **Applications**. |
 
-Open a terminal and paste these lines one at a time:
-- **Mac:** press `⌘ Space`, type *Terminal*, press Enter.
-- **Windows:** press the Windows key, type *cmd*, press Enter (Command Prompt).
+**The first time you open it,** your computer warns you, because the app isn't signed by a paid
+developer account:
+- **Windows** says *"Windows protected your PC"*: click **More info**, then **Run anyway**.
+- **Mac** says it *"cannot be opened"*: open **System Settings → Privacy & Security**, scroll down,
+  and click **Open Anyway** next to Oru Companion.
+
+A character walks in, says hi, and walks off. 🎉
+
+Look for the small **person icon in the menu bar** at the top of the screen (on Windows, in the
+tray by the clock; click the **^** arrow if you don't see it). Everything is in that menu.
+
+<details>
+<summary><b>Or run it from the source code</b> (for developers, or to get the newest changes)</summary>
+
+You need [Node.js](https://nodejs.org) (LTS) and Git
+([Git for Windows](https://git-scm.com/download/win); on a Mac, run `git --version` and macOS
+offers to install it). Then, in Terminal on a Mac or Command Prompt (`cmd`) on Windows:
 
 ```sh
 git clone https://github.com/jasimcm/our-fav-emote.git
@@ -34,12 +46,11 @@ npm install
 npm start
 ```
 
-A character walks in, says hi, and walks off. 🎉
+To update later, run `git pull`, then `npm start`.
+</details>
 
-Look for the small **person icon in the menu bar** at the top of the screen (on Windows, in the
-tray by the clock). Everything is in that menu.
-
-> Next time, to start it again: open the terminal, run `cd our-fav-emote`, then `npm start`.
+*Only for making your own character:* a **Gemini** account that can make videos (Gemini Pro makes
+3 videos a day, which is exactly enough).
 
 ## Step 2: Make it yours
 
@@ -91,7 +102,7 @@ The app removes the background and gives you a clean image. Press **Save image�
 | No character on the screen | The default behaviour only shows them for reminders. Use menu → **Remind me now** to call them. Also check the menu doesn't say **Resume** (paused). |
 | The app says the feet or head are cut off | Use a photo with your whole body in it, from head to shoes. |
 | "HEIC photos aren't supported here" (Windows) | Save or send the photo as JPEG and choose it again. |
-| The photo came out on its side | Update the app (`git pull`, then `npm start`). Phone photos are now turned the right way up automatically. |
+| The photo came out on its side | Download the newest version. Phone photos are now turned the right way up automatically. |
 | A move looks wrong in the preview, e.g. the wave is cut short | Ask Gemini for that video again in the same chat, then press **Create character** again. |
 | The character slides or walks oddly | Regenerate video 3 (the walk). It needs a side view, walking in place. |
 | Want to stop it | Menu → **Quit**. |
