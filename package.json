@@ -119,7 +119,9 @@
       "files": [
         "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
         "!node_modules/onnxruntime-node/bin/napi-v*/win32/**",
-        "!node_modules/onnxruntime-node/bin/napi-v*/linux/arm64/**"
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/arm64/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/x64/libonnxruntime_providers_cuda.so",
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/x64/libonnxruntime_providers_tensorrt.so"
       ]
     },
     "appImage": {
