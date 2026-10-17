@@ -9,6 +9,14 @@ import { REMINDER_IDS, Reminders, todayStats } from './reminders';
 import { loadSettings, saveSettings } from './settings';
 
 registerScheme();
+if (process.platform === 'linux') {
+  // see-through windows on Linux need ARGB visuals
+  app.commandLine.appendSwitch('enable-transparent-visuals');
+  // Ubuntu 24.04+ blocks the Chromium sandbox for AppImages (AppArmor user namespaces), which
+  // makes them crash at start. The app only loads its own local pages, so run AppImages without
+  // it; the .deb installs the sandbox helper properly and keeps it.
+  if (process.env.APPIMAGE) app.commandLine.appendSwitch('no-sandbox');
+}
 // the smoke test runs against its own throwaway data folder
 if (process.env.ORU_SMOKE) app.setPath('userData', path.join(process.env.ORU_SMOKE, 'userData'));
 if (!app.requestSingleInstanceLock()) app.exit(0);

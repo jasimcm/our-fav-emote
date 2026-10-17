@@ -12,7 +12,8 @@
     "smoke": "npm run build && node scripts/smoke.mjs",
     "dist:mac": "npm run build && npm run build:segment && electron-builder --mac --publish never",
     "build:segment": "mkdir -p tools/bin && swiftc -O tools/segment.swift -o tools/bin/segment",
-    "test-media": "node scripts/make-test-media.mjs .smoke-media"
+    "test-media": "node scripts/make-test-media.mjs .smoke-media",
+    "dist:linux": "npm run build && electron-builder --linux --publish never"
   },
   "author": "Jasim",
   "license": "MIT",
@@ -34,8 +35,7 @@
       "!characters/**/import.sh",
       "!characters/**/sources.json",
       "assets/**",
-      "package.json",
-      "!node_modules/onnxruntime-node/bin/napi-v*/linux/**"
+      "package.json"
     ],
     "win": {
       "target": [
@@ -55,7 +55,8 @@
       "icon": "assets/icon.png",
       "files": [
         "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
-        "!node_modules/onnxruntime-node/bin/napi-v*/win32/arm64/**"
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/arm64/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/**"
       ]
     },
     "nsis": {
@@ -82,7 +83,8 @@
         }
       ],
       "files": [
-        "!node_modules/onnxruntime-node/bin/napi-v*/win32/**"
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/**"
       ]
     },
     "asarUnpack": [
@@ -94,6 +96,37 @@
     },
     "dmg": {
       "artifactName": "Oru-Companion-${version}-mac-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Utility",
+      "maintainer": "Jasim <104933297+jasimcm@users.noreply.github.com>",
+      "synopsis": "A desktop companion that walks in to remind you to drink water",
+      "files": [
+        "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/win32/**",
+        "!node_modules/onnxruntime-node/bin/napi-v*/linux/arm64/**"
+      ]
+    },
+    "appImage": {
+      "artifactName": "Oru-Companion-${version}-linux-x86_64.${ext}"
+    },
+    "deb": {
+      "artifactName": "oru-companion_${version}_amd64.${ext}"
     }
   },
   "dependencies": {

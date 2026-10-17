@@ -1,5 +1,6 @@
-# Builds the Windows .exe and the Mac .dmg on real Windows/Mac machines (the bundled ffmpeg and
-# AI runtime are platform-specific), after running the app's smoke test on each.
+# Builds the Windows .exe, the Mac .dmg and the Linux AppImage/.deb on real Windows/Mac/Linux
+# machines (the bundled ffmpeg and AI runtime are platform-specific), after running the app's
+# smoke test on each.
 # Run it from the Actions tab, or push a tag like v0.2.0 to also publish a GitHub Release.
 name: Build apps
 
@@ -23,6 +24,11 @@ jobs:
           - os: macos-14
             dist: dist:mac
             files: release/*.dmg
+          - os: ubuntu-latest
+            dist: dist:linux
+            files: |
+              release/*.AppImage
+              release/*.deb
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -39,11 +45,17 @@ jobs:
           path: ${{ runner.temp }}/oru-models
           key: u2net-human-seg-01eb6a29
 
+      - name: Linux test display
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -q && sudo apt-get install -yq xvfb
+
       - name: Smoke test (the real app, including making a character from test media)
-        run: npm run smoke -- --creator
+        run: ${{ runner.os == 'Linux' && 'xvfb-run -a -s "-screen 0 1920x1080x24"' || '' }} npm run smoke -- --creator
         env:
+          # CI containers can't use Chromium's sandbox
+          ELECTRON_DISABLE_SANDBOX: ${{ runner.os == 'Linux' && '1' || '' }}
           ORU_MODELS_DIR: ${{ runner.temp }}/oru-models
-          ORU_PORTABLE: ${{ matrix.os == 'windows-latest' && '' || '1' }}
+          ORU_PORTABLE: ${{ matrix.os == 'macos-14' && '1' || '' }}
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -73,4 +85,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" release/* --repo "$GITHUB_REPOSITORY" --title "Oru Companion $GITHUB_REF_NAME" --notes "**Windows:** download \`Oru-Companion-Setup-*.exe\` and double-click it (or the \`portable\` .exe to run without installing). **Mac (Apple silicon):** download the \`.dmg\`. See the README for the first-run steps."
+          gh release create "$GITHUB_REF_NAME" release/* --repo "$GITHUB_REPOSITORY" --title "Oru Companion $GITHUB_REF_NAME" --notes "**Windows:** download \`Oru-Companion-Setup-*.exe\` and double-click it (or the \`portable\` .exe to run without installing). **Mac (Apple silicon):** download the \`.dmg\`. **Linux:** the \`.AppImage\` (make it executable, then run it) or the \`.deb\` for Ubuntu/Debian. See the README for the first-run steps."

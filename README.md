@@ -20,6 +20,8 @@ Go to the **[Releases page](https://github.com/jasimcm/our-fav-emote/releases/la
 | **Windows** | `Oru-Companion-Setup-….exe` | Double-click it. It installs and starts by itself. |
 | Windows, no install | `Oru-Companion-…-portable.exe` | Double-click it to run it from anywhere, e.g. a USB stick. |
 | **Mac** (M1 or newer) | `Oru-Companion-…-mac-arm64.dmg` | Open it and drag the app into **Applications**. |
+| **Linux**: Ubuntu, Debian, Mint… | `oru-companion_…_amd64.deb` | Double-click it to install, or run `sudo apt install ./oru-companion_*.deb`. |
+| **Linux**: any other | `Oru-Companion-…-linux-x86_64.AppImage` | Right-click → *Properties* → allow *executing as a program*, then double-click it. Or run `chmod +x Oru-Companion-*.AppImage`, then `./Oru-Companion-*.AppImage`. |
 
 **The first time you open it,** your computer warns you, because the app isn't signed by a paid
 developer account:
@@ -31,6 +33,11 @@ A character walks in, says hi, and walks off. 🎉
 
 Look for the small **person icon in the menu bar** at the top of the screen (on Windows, in the
 tray by the clock; click the **^** arrow if you don't see it). Everything is in that menu.
+
+> **Linux notes:** the see-through window needs a desktop with a compositor, which GNOME, KDE,
+> Cinnamon and most others have. On GNOME the tray icon needs the *AppIndicator* extension
+> (Ubuntu has it already). The automatic "pause during fullscreen apps and games" is Windows-only
+> for now.
 
 <details>
 <summary><b>Or run it from the source code</b> (for developers, or to get the newest changes)</summary>
