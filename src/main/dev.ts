@@ -52,7 +52,7 @@ async function smoke(ctx: Ctx, outDir: string): Promise<void> {
   };
 
   // ---- visit mode (default): greeting visit walks in from the left, waves, walks off to the right
-  await wait(1500);
+  await waitFor('the greeting visit to start', async () => { const st = await state(); return !st.hidden && !!st.clip; });
   const enter = await state();
   console.log(`[smoke] visit: greeting clip ${enter.clip}, x ${Math.round(enter.x)} of ${enter.w}`);
   await waitFor('greeting visit to end', async () => (await state()).hidden);

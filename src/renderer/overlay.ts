@@ -233,7 +233,7 @@ function walkPxPerSec(): number {
 }
 
 // ---------- visits: walk in from one side, ask, walk out the other side ----------
-let away = false; // off-screen between visits
+let away = true; // off-screen between visits (the character starts hidden)
 let nextEntry: 'left' | 'right' = 'left';
 const offLeft = () => -charWidth() / 2 - 12;
 const offRight = () => window.innerWidth + charWidth() / 2 + 12;
@@ -436,7 +436,8 @@ async function ask(r: ReminderPayload, g: number): Promise<void> {
 }
 
 api.onRemind((r) => {
-  if (mode === 'drag' || mode === 'fall' || mode === 'paused') pendingReminder = r;
+  // still loading the clips: show it once the character is ready
+  if (mode === 'loading' || mode === 'drag' || mode === 'fall' || mode === 'paused') pendingReminder = r;
   else showReminder(r);
 });
 
@@ -489,6 +490,13 @@ api.onCharacter(async (c) => {
   currentClip = null;
   applyScale();
   play('idle');
+  if (pendingReminder && !current) {
+    // a reminder arrived while the clips were loading: that's the first visit
+    greeted = true;
+    mode = 'idle';
+    showReminder(pendingReminder);
+    return;
+  }
   if (visiting() && !current) {
     // say hello with a short visit (also shows off a newly chosen character)
     if (!away && !offscreen()) away = true;
@@ -504,6 +512,7 @@ api.onCharacter(async (c) => {
     });
     return;
   }
+  away = false;
   charEl.hidden = false;
   requestAnimationFrame(() => place());
   if (current) {
