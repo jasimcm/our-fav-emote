@@ -50,6 +50,7 @@ jobs:
         with:
           name: smoke-${{ matrix.os }}
           path: .smoke/*.png
+          include-hidden-files: true
 
       - run: npm run ${{ matrix.dist }}
 

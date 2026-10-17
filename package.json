@@ -11,7 +11,7 @@
     "dist:win": "npm run build && electron-builder --win --publish never",
     "smoke": "npm run build && node scripts/smoke.mjs",
     "dist:mac": "npm run build && npm run build:segment && electron-builder --mac --publish never",
-    "build:segment": "swiftc -O tools/segment.swift -o tools/bin/segment",
+    "build:segment": "mkdir -p tools/bin && swiftc -O tools/segment.swift -o tools/bin/segment",
     "test-media": "node scripts/make-test-media.mjs .smoke-media"
   },
   "author": "Jasim",
