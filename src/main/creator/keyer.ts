@@ -18,6 +18,14 @@ export function pngSize(file: string): { w: number; h: number } {
   return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
 }
 
+/**
+ * Hue distance from the backdrop, as a fraction of the backdrop's own saturation: below KEY_FROM
+ * is backdrop, above KEY_TO is fully the person, in between is a soft edge. The photo step picks a
+ * backdrop whose hue none of the clothes come within KEY_TO of (photo.ts), so e.g. navy jeans are
+ * never filmed in front of blue.
+ */
+export const KEY_FROM = 0.3, KEY_TO = 0.7;
+
 // opponent-colour plane, brightness ignored (same measure as tools/segment.swift)
 const cb = (r: number, g: number, b: number) => b - (r + g) / 2;
 const cg = (r: number, g: number) => g - r;
@@ -32,10 +40,15 @@ function backdrop(px: Uint8Array, w: number, h: number): [number, number, number
   return [med(rs), med(gs), med(bs)];
 }
 
-/** Keeps the largest connected shape (the person) plus a few px of its soft edge. */
-function keepLargest(alpha: Uint8Array, w: number, h: number): void {
+/**
+ * Keeps the person: every connected shape at least 2% the size of the largest, plus a few px of
+ * soft edge. Not just the largest: a thin neck or a motion-blurred hand can come out as a separate
+ * shape. A watermark or stray speck is far smaller than 2%.
+ */
+function keepPerson(alpha: Uint8Array, w: number, h: number): void {
   const label = new Int32Array(w * h);
-  let best = 0, bestSize = 0, next = 0;
+  const sizes: number[] = [0];
+  let bestSize = 0, next = 0;
   const stack = new Int32Array(w * h);
   for (let s = 0; s < w * h; s++) {
     if (alpha[s] < 128 || label[s]) continue;
@@ -52,11 +65,12 @@ function keepLargest(alpha: Uint8Array, w: number, h: number): void {
       if (i >= w && !label[i - w] && alpha[i - w] >= 128) { label[i - w] = next; stack[top++] = i - w; }
       if (i < w * (h - 1) && !label[i + w] && alpha[i + w] >= 128) { label[i + w] = next; stack[top++] = i + w; }
     }
-    if (size > bestSize) { bestSize = size; best = next; }
+    sizes.push(size);
+    if (size > bestSize) bestSize = size;
   }
-  // grow the kept shape by 3px so its semi-transparent edge survives
+  // grow the kept shapes by 3px so their semi-transparent edges survive
   let keep = new Uint8Array(w * h);
-  for (let i = 0; i < w * h; i++) keep[i] = label[i] === best && best ? 1 : 0;
+  for (let i = 0; i < w * h; i++) keep[i] = label[i] && sizes[label[i]] >= 0.02 * bestSize ? 1 : 0;
   for (let pass = 0; pass < 3; pass++) {
     const grown = keep.slice();
     for (let i = 0; i < w * h; i++) {
@@ -95,12 +109,12 @@ function keyFrame(px: Uint8Array, w: number, h: number): FrameStats {
     // saturated backdrop: compare hue only (shadows and vignetting key out too);
     // a grey/white backdrop falls back to plain colour distance
     const keep = saturated
-      ? (Math.hypot(cb(r, g, b) - bgCb, cg(r, g) - bgCg) - 0.3 * mag) / (0.5 * mag)
+      ? (Math.hypot(cb(r, g, b) - bgCb, cg(r, g) - bgCg) - KEY_FROM * mag) / ((KEY_TO - KEY_FROM) * mag)
       : (Math.hypot(r - br, g - bg, b - bb) - 40) / 70;
     keepF[i] = Math.min(1, Math.max(0, keep));
     alpha[i] = Math.round(keepF[i] * 255);
   }
-  keepLargest(alpha, w, h);
+  keepPerson(alpha, w, h);
   for (let i = 0; i < w * h; i++) {
     const a = alpha[i];
     px[i * 4 + 3] = a;

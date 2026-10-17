@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { KEY_TO } from './keyer';
 import { cutOutPhoto } from './photo-ml';
 import { ffmpeg, ffmpegPath, run, segmentPath, useVision } from './tools';
 
@@ -33,7 +34,7 @@ async function pickBackdrop(cutout: string): Promise<(typeof BACKDROPS)[number]>
       if (raw[i + 3] < 200) continue;
       total++;
       const [c, g] = chroma(raw[i], raw[i + 1], raw[i + 2]);
-      if (Math.hypot(c - bc, g - bg) < 0.65 * mag) near++;
+      if (Math.hypot(c - bc, g - bg) < KEY_TO * mag) near++; // would be (partly) keyed out
     }
     return { bd, share: total ? near / total : 1 };
   });
